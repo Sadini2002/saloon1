@@ -1,6 +1,6 @@
 // script to seed the database with initial data
 
-import { PrismaClient, Prisma } from "../app/generated/prisma/client";
+import { PrismaClient, Prisma } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
 import bcrypt from "bcryptjs";
@@ -36,12 +36,30 @@ const userData: Prisma.UserCreateInput[] = [
 
 async function main() {
   for (const user of userData) {
-    await prisma.user.create({
-      data: user,
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {
+        firstName: user.firstName,
+        lastname: user.lastname,
+        password: hashedPassword,
+        role: user.role,
+        status: user.status,
+        privileges: user.privileges,
+      },
+      create: {
+        email: user.email,
+        firstName: user.firstName,
+        lastname: user.lastname,
+        password: hashedPassword,
+        role: user.role,
+        status: user.status,
+        privileges: user.privileges,
+      },
     });
   }
 
-  console.log("Users created successfully!");
+  console.log("Users seeded successfully!");
 }
 
 main()

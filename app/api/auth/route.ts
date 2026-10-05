@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     const token = await new jose.SignJWT({
       email: user.email,
       firstName: user.firstName,
-      lastName: user.lastName,
+      lastName: user.lastname,
       role: user.role,
       privileges: user.privileges,
     })
