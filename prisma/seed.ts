@@ -1,0 +1,54 @@
+// script to seed the database with initial data
+
+import { PrismaClient, Prisma } from "../app/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import "dotenv/config";
+import bcrypt from "bcryptjs";
+
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const prisma = new PrismaClient({
+  adapter,
+});
+
+const userData: Prisma.UserCreateInput[] = [
+  {
+    email: "admin@gmail.com",
+    firstName: "Admin",
+    lastname: "User1",
+    password: "admin123",
+    role: "ADMIN",
+    status: "ACTIVE",
+    privileges: '["CREATE_USER", "DELETE_USER", "UPDATE_USER"]',
+  },
+  {
+    email: "user1@gmail.com",
+    firstName: "John1",
+    lastname: "Doe",
+    password: "user1234",
+    role: "USER",
+    status: "ACTIVE",
+    privileges: '["READ_POST", "CREATE_COMMENT"]',
+  },
+];
+
+async function main() {
+  for (const user of userData) {
+    await prisma.user.create({
+      data: user,
+    });
+  }
+
+  console.log("Users created successfully!");
+}
+
+main()
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

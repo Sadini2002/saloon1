@@ -11,17 +11,30 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
-model User { 
-  id    Int     @id @default(autoincrement()) 
-  email String  @unique
-  name  String?
-  posts Post[]
-} 
-model Post { 
-  id        Int     @id @default(autoincrement()) 
-  title     String
-  content   String?
-  published Boolean @default(false) 
-  author    User    @relation(fields: [authorId], references: [id]) 
-  authorId  Int
-} 
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  phone String? @unique
+  firstName String
+  lastname String
+  password String 
+  role String @default("CUSTOMER")
+  status String @default("ACTIVE")//actie, banned and suspended
+  createdAt DateTime @default(now())
+  lastLogin DateTime? @default(now())
+  privileges String? @default("[]")
+  //gender, email, phone, address, date of birth, profile picture, etc.
+  
+
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  image       String?
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
